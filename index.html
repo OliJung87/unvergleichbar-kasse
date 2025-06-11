@@ -6,46 +6,82 @@
     <title>UnvergleichBAR Kasse</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; background-color: #f4f4f4; }
-        h1 { font-size: 28px; margin-bottom: 20px; }
-        .button-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; max-width: 400px; margin: 0 auto; }
-        button { padding: 20px; font-size: 20px; border: none; border-radius: 8px; background-color: #007aff; color: white; }
-        button:hover { background-color: #005bb5; }
-        .total { font-size: 32px; margin: 20px 0; }
-        .reset { background-color: #ff3b30; }
-        .pfand { background-color: #34c759; } /* grün */
+        body { font-family: sans-serif; background: #f9f9f9; padding: 20px; }
+        h1 { text-align: center; margin-bottom: 30px; }
+        .item { display: flex; align-items: center; justify-content: space-between; margin: 10px auto; max-width: 400px; background: #fff; padding: 10px 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .label { flex: 1; text-align: center; font-size: 18px; }
+        .btn { font-size: 22px; padding: 4px 12px; margin: 0 10px; border: none; border-radius: 6px; }
+        .minus { background: #ff3b30; color: white; }
+        .plus { background: #34c759; color: white; }
+        .total { font-size: 24px; text-align: center; margin: 30px 0; }
+        .reset-btn { display: block; margin: 0 auto; padding: 12px 24px; font-size: 18px; background: #007aff; color: white; border: none; border-radius: 8px; }
     </style>
 </head>
 <body>
-    <h1>UnvergleichBAR Kasse</h1>
-    <div class="total">Gesamt: <span id="total">0.00</span> €</div>
-    <div class="button-grid">
-        <button onclick="addAmount(7.00)">7 €</button>
-        <button onclick="addAmount(6.00)">6 €</button>
-        <button onclick="addAmount(3.50)">3,50 €</button>
-        <button onclick="addAmount(2.50)">2,50 €</button>
-        <button onclick="addAmount(2.00)">2 €</button>
-        <button class="pfand" onclick="addAmount(2.00)">Pfand (2 €)</button>
-    </div>
-    <br>
-    <button class="reset" onclick="resetTotal()">Zurücksetzen</button>
+<h1>UnvergleichBAR Kasse</h1>
 
-    <script>
+<div id="items"></div>
+
+<div class="total">Gesamt: <span id="total">0.00</span> €</div>
+<button class="reset-btn" onclick="resetAll()">Zurücksetzen</button>
+
+<script>
+    const products = [
+        { name: "Longdrink", price: 6.00 },
+        { name: "Cocktail", price: 7.00 },
+        { name: "Sekt / Secco", price: 6.00 },
+        { name: "Kläussle", price: 3.50 },
+        { name: "Salitos", price: 4.50 },
+        { name: "Shot", price: 2.00 },
+        { name: "Shot Aktion", price: 10.00, extraShots: 6 },
+        { name: "Alk.Frei", price: 4.00 },
+        { name: "Wasser", price: 3.00 },
+        { name: "Pfand", price: 2.00 }
+    ];
+
+    let counts = {};
+    products.forEach(p => counts[p.name] = 0);
+
+    function updateTotal() {
         let total = 0;
+        products.forEach(p => {
+            total += p.price * counts[p.name];
+        });
+        document.getElementById("total").textContent = total.toFixed(2);
+    }
 
-        function addAmount(amount) {
-            total += amount;
-            updateDisplay();
-        }
+    function changeCount(name, amount) {
+        if (!(name in counts)) return;
+        counts[name] += amount;
+        if (counts[name] < 0) counts[name] = 0;
+        document.getElementById("count-" + name).textContent = "(" + counts[name] + ")";
+        updateTotal();
+    }
 
-        function resetTotal() {
-            total = 0;
-            updateDisplay();
-        }
+    function resetAll() {
+        products.forEach(p => {
+            counts[p.name] = 0;
+            document.getElementById("count-" + p.name).textContent = "(0)";
+        });
+        updateTotal();
+    }
 
-        function updateDisplay() {
-            document.getElementById("total").textContent = total.toFixed(2);
-        }
-    </script>
+    function renderItems() {
+        const container = document.getElementById("items");
+        products.forEach(p => {
+            const div = document.createElement("div");
+            div.className = "item";
+            div.innerHTML = `
+                <button class="btn minus" onclick="changeCount('${p.name}', -1)">−</button>
+                <div class="label">${p.name} <span id="count-${p.name}">(0)</span></div>
+                <button class="btn plus" onclick="changeCount('${p.name}', 1)">+</button>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    renderItems();
+    updateTotal();
+</script>
 </body>
 </html>

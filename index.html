@@ -13,6 +13,7 @@
         button:hover { background-color: #005bb5; }
         .total { font-size: 32px; margin: 20px 0; }
         .reset { background-color: #ff3b30; }
+        .pfand { background-color: #34c759; } /* grün */
     </style>
 </head>
 <body>
@@ -24,7 +25,7 @@
         <button onclick="addAmount(3.50)">3,50 €</button>
         <button onclick="addAmount(2.50)">2,50 €</button>
         <button onclick="addAmount(2.00)">2 €</button>
-        <button onclick="addAmount(2.00)">Pfand</button>
+        <button class="pfand" onclick="addAmount(2.00)">Pfand (2 €)</button>
     </div>
     <br>
     <button class="reset" onclick="resetTotal()">Zurücksetzen</button>
